@@ -81,21 +81,88 @@ b {
   gap: 9px;
   text-transform: uppercase;
 }
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--go);
-  box-shadow: 0 0 12px var(--go);
-  animation: pulse 2.4s infinite;
+/* brandmark: the "4" tile stamps down with a chalk-paint splat on load */
+.brandmark {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
 }
-@keyframes pulse {
-  0%,
-  100% {
+.mark-4 {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.55));
+  transform-origin: 50% 60%;
+  animation: stamp 0.62s cubic-bezier(0.18, 1.25, 0.4, 1) both;
+}
+.splat {
+  position: absolute;
+  inset: -16px;
+  z-index: 1;
+  background: radial-gradient(
+    closest-side,
+    rgba(49, 214, 126, 0.55),
+    transparent 72%
+  );
+  clip-path: polygon(
+    50% 0%,
+    63% 16%,
+    84% 10%,
+    82% 32%,
+    100% 42%,
+    84% 55%,
+    92% 78%,
+    68% 74%,
+    55% 96%,
+    44% 76%,
+    18% 84%,
+    24% 60%,
+    4% 50%,
+    22% 36%,
+    14% 14%,
+    38% 20%
+  );
+  animation: splat 0.62s ease-out both;
+  pointer-events: none;
+}
+@keyframes stamp {
+  0% {
+    transform: scale(1.7) rotate(-9deg);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(0.93) rotate(2deg);
     opacity: 1;
   }
-  50% {
-    opacity: 0.35;
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+@keyframes splat {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  42% {
+    transform: scale(1.18);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.26;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mark-4,
+  .splat {
+    animation: none;
+  }
+  .splat {
+    opacity: 0.26;
   }
 }
 h1 {
@@ -735,9 +802,35 @@ td.num {
   padding: 22px 20px 40px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
   border-top: 1px solid var(--line);
   font-family: var(--mono);
   font-size: 11.5px;
   color: var(--muted);
   letter-spacing: 0.05em;
+}
+.foot b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.foot-data {
+  opacity: 0.7;
+}
+.nr {
+  color: #22c55e;
+  font-weight: 700;
+  border-bottom: 0;
+}
+.nr:hover {
+  border-bottom: 1px solid #22c55e;
+}
+@media (max-width: 620px) {
+  .foot {
+    justify-content: flex-start;
+  }
+  .foot-data {
+    display: none;
+  }
 }

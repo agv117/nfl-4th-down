@@ -14,10 +14,10 @@
       href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=1" />
+    <link rel="stylesheet" href="styles.css?v=2" />
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314532b'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%2334d17a' font-family='monospace' font-weight='bold'%3E4%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c3a20'/%3E%3Cg stroke='%23ffffff' stroke-opacity='.22' stroke-width='1'%3E%3Cline x1='8' y1='3' x2='8' y2='29'/%3E%3Cline x1='24' y1='3' x2='24' y2='29'/%3E%3C/g%3E%3Cg stroke='%23ffffff' stroke-opacity='.42' stroke-width='1'%3E%3Cline x1='14.5' y1='6' x2='17.5' y2='6'/%3E%3Cline x1='14.5' y1='26' x2='17.5' y2='26'/%3E%3C/g%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%2334d17a' font-family='monospace' font-weight='bold'%3E4%3C/text%3E%3C/svg%3E"
     />
   </head>
   <body>
@@ -25,9 +25,47 @@
 
     <header class="masthead">
       <div class="mast-inner">
+        <div class="brandmark" aria-hidden="true">
+          <span class="splat"></span>
+          <svg
+            class="mark-4"
+            viewBox="0 0 32 32"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="32" height="32" rx="7" fill="#0c3a20" />
+            <rect
+              x="0.5"
+              y="0.5"
+              width="31"
+              height="31"
+              rx="6.5"
+              fill="none"
+              stroke="#1c6a3c"
+              stroke-width="1"
+            />
+            <g stroke="#ffffff" stroke-opacity=".2" stroke-width="1">
+              <line x1="8" y1="3" x2="8" y2="29" />
+              <line x1="24" y1="3" x2="24" y2="29" />
+            </g>
+            <g stroke="#ffffff" stroke-opacity=".42" stroke-width="1">
+              <line x1="14.5" y1="6" x2="17.5" y2="6" />
+              <line x1="14.5" y1="26" x2="17.5" y2="26" />
+            </g>
+            <text
+              x="16"
+              y="23.5"
+              font-size="20"
+              text-anchor="middle"
+              fill="#34d17a"
+              font-family="'JetBrains Mono', monospace"
+              font-weight="700"
+            >
+              4
+            </text>
+          </svg>
+        </div>
         <div class="kicker">
-          <span class="dot"></span> NFL 4TH-DOWN DECISION MODEL · A DECADE OF
-          PLAY-BY-PLAY
+          Project 01 · Win-probability engine · 405,000 NFL plays · 2015–2024
         </div>
         <h1>SHOULD THEY HAVE<br /><em>GONE FOR IT?</em></h1>
         <p class="dek">
@@ -266,15 +304,23 @@
               target="_blank"
               rel="noopener"
               >github.com/agv117/nfl-4th-down</a
-            >.
+            >. Project 01 in a series of interactive sports-analytics builds.
           </p>
         </div>
       </section>
     </main>
 
     <footer class="foot">
-      <span>Anand Vaghasia · 2026</span>
-      <span class="mono" id="footData">nflverse 2015–2024</span>
+      <span class="foot-left"
+        ><b>Should They Have Gone For It?</b> · Anand G. Vaghasia · 2026</span
+      >
+      <span class="mono foot-data" id="footData">nflverse 2015–2024</span>
+      <span class="foot-right"
+        >Powered by
+        <a href="https://netryse.com" target="_blank" rel="noopener" class="nr"
+          >NetRyse</a
+        ></span
+      >
     </footer>
 
     <script src="app.js?v=1"></script>
