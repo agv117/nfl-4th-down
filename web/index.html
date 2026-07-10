@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Should They Have Gone For It? — NFL 4th-Down Decision Model</title>
+    <meta
+      name="description"
+      content="Set any NFL game state and get the analytically-correct 4th-down call: go, punt, or kick. Expected-value maximization under uncertainty, built on a decade of nflverse play-by-play."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=1" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314532b'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%2334d17a' font-family='monospace' font-weight='bold'%3E4%3C/text%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div class="grain"></div>
+
+    <header class="masthead">
+      <div class="mast-inner">
+        <div class="kicker">
+          <span class="dot"></span> NFL 4TH-DOWN DECISION MODEL · A DECADE OF
+          PLAY-BY-PLAY
+        </div>
+        <h1>SHOULD THEY HAVE<br /><em>GONE FOR IT?</em></h1>
+        <p class="dek">
+          Set any game state. Get the call the math actually favors: <b>go</b>,
+          <b>punt</b>, or <b>field goal</b>, with the win probability each
+          choice buys. This is expected-value maximization under uncertainty,
+          applied to the most-second-guessed decision in football.
+        </p>
+        <nav class="tabs" role="tablist">
+          <button class="tab is-active" data-view="call">The Call</button>
+          <button class="tab" data-view="board">Coach Leaderboard</button>
+          <button class="tab" data-view="method">Method</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- ================= THE CALL ================= -->
+      <section class="view is-active" data-view="call">
+        <div class="call-grid">
+          <div class="panel field-panel">
+            <div class="panel-label">GAME STATE</div>
+            <div class="field-wrap">
+              <div
+                id="field"
+                class="field"
+                aria-label="Football field. Click to set the ball spot."
+              >
+                <div class="ez ez-own"><span>OWN</span></div>
+                <div class="turf" id="turf">
+                  <!-- yard lines + numbers injected -->
+                  <div class="ball" id="ball" title="Line of scrimmage"></div>
+                  <div
+                    class="togo-marker"
+                    id="togoMarker"
+                    title="Line to gain"
+                  ></div>
+                </div>
+                <div class="ez ez-opp"><span>OPP</span></div>
+              </div>
+              <div class="spot-readout">
+                <span id="spotLabel">OPP 45</span> ·
+                <span class="mono" id="spotSub">4th &amp; 3</span>
+              </div>
+            </div>
+
+            <div class="controls">
+              <div class="ctrl">
+                <label
+                  >Yards to go
+                  <output id="togoOut" class="mono">3</output></label
+                >
+                <input type="range" id="togo" min="1" max="15" value="3" />
+              </div>
+              <div class="ctrl">
+                <label
+                  >Ball on (yards to end zone)
+                  <output id="ylOut" class="mono">45</output></label
+                >
+                <input type="range" id="yl" min="1" max="99" value="45" />
+              </div>
+              <div class="ctrl">
+                <label
+                  >Score differential
+                  <output id="sdOut" class="mono">even</output></label
+                >
+                <input type="range" id="sd" min="-24" max="24" value="0" />
+              </div>
+              <div class="ctrl ctrl-row">
+                <div>
+                  <label>Quarter</label>
+                  <div class="seg" id="qtrSeg">
+                    <button data-q="1">1</button><button data-q="2">2</button>
+                    <button class="on" data-q="3">3</button
+                    ><button data-q="4">4</button><button data-q="5">OT</button>
+                  </div>
+                </div>
+                <div>
+                  <label
+                    >Clock <output id="clkOut" class="mono">8:00</output></label
+                  >
+                  <input
+                    type="range"
+                    id="clk"
+                    min="0"
+                    max="900"
+                    value="480"
+                    step="5"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel verdict-panel" id="verdictPanel">
+            <div class="panel-label">THE VERDICT</div>
+            <div class="verdict" id="verdict">
+              <div class="v-call" id="vCall">GO FOR IT</div>
+              <div class="v-edge" id="vEdge">
+                +0.0 win-prob points vs. the next-best option
+              </div>
+            </div>
+            <div class="bars" id="bars"><!-- injected --></div>
+            <div class="v-note" id="vNote"></div>
+          </div>
+        </div>
+        <p class="fineprint">
+          Win probability is modeled from every 1st-and-10 outcome each choice
+          can lead to. Rare, extreme states carry more noise. v1 has no weather,
+          injuries, or timeout context.
+        </p>
+      </section>
+
+      <!-- ================= LEADERBOARD ================= -->
+      <section class="view" data-view="board">
+        <div class="board-head">
+          <h2>WIN PROBABILITY BURNED BY KICKING</h2>
+          <p>
+            For every real 4th-down punt or field-goal attempt from
+            <span id="boardYears">2020–2024</span>, when the model preferred
+            going for it, the coach is charged the win probability they gave up.
+            Summed across five seasons. Lower is bolder.
+          </p>
+        </div>
+        <div class="panel board-panel">
+          <table id="boardTable">
+            <thead>
+              <tr>
+                <th data-sort="rank">#</th>
+                <th data-sort="coach">Coach</th>
+                <th data-sort="team">Team</th>
+                <th data-sort="wp_burned" class="num sorted">WP burned ▾</th>
+                <th data-sort="conservative_kicks" class="num">
+                  Conservative kicks
+                </th>
+                <th data-sort="burn_per_kick" class="num">Per kick</th>
+              </tr>
+            </thead>
+            <tbody id="boardBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= METHOD ================= -->
+      <section class="view" data-view="method">
+        <div class="method">
+          <h2>HOW THE MODEL DECIDES</h2>
+          <p>
+            A 4th down is a choice between three lotteries. The model prices
+            each one in the only currency that matters at the end of a game:
+            <b>win probability</b>.
+          </p>
+          <ol class="steps">
+            <li>
+              <b>Win probability model.</b> A gradient-boosted model trained on
+              ~450,000 plays (nflverse play-by-play, 2015–2024) learns the
+              chance the team with the ball wins, given score, time, field
+              position, down, and distance.
+            </li>
+            <li>
+              <b>Go for it.</b> Win prob = P(convert) × WP(1st-and-10 at the new
+              spot) + P(fail) × WP(opponent takes over on downs). Conversion
+              rates come from a decade of 3rd- and 4th-down attempts by
+              distance.
+            </li>
+            <li>
+              <b>Field goal.</b> WP = P(make) × WP(up 3, opponent receives) +
+              P(miss) × WP(opponent takes over at the spot). Make rates are
+              empirical by kick distance.
+            </li>
+            <li>
+              <b>Punt.</b> WP = WP(opponent takes over at the expected post-punt
+              field position), measured from real punt outcomes by field
+              position.
+            </li>
+            <li>
+              The option with the highest win probability is the call. The edge
+              shown is how many win-probability points it beats the next-best
+              option by.
+            </li>
+          </ol>
+
+          <h3>Honesty</h3>
+          <ul class="assump">
+            <li>
+              Empirical win probability is noisy in rare states (long distances,
+              extreme score gaps, final seconds). Treat those calls as
+              directional.
+            </li>
+            <li>
+              v1 ignores weather, injuries, kicker/defense quality, and
+              timeouts. A great or terrible kicker moves the field-goal line the
+              model can't see.
+            </li>
+            <li>
+              The coach leaderboard uses the model's own preference as the
+              yardstick. It measures conservatism against this model, not
+              against ground truth. Public models like
+              <a
+                href="https://www.nfl4th.com/articles/4th-down-research.html"
+                target="_blank"
+                rel="noopener"
+                >nfl4th</a
+              >
+              reach the same broad conclusion: coaches kick too much.
+            </li>
+          </ul>
+
+          <h3>Data &amp; build</h3>
+          <p>
+            Play-by-play from
+            <a
+              href="https://github.com/nflverse/nflverse-data"
+              target="_blank"
+              rel="noopener"
+              >nflverse</a
+            >
+            (open, no scraping of Sports-Reference). The Python pipeline pulls
+            ten seasons locally, trains the model, and bakes small JSON lookup
+            tables; the page does all the decision math in your browser, so
+            there is zero server cost and the arithmetic is fully inspectable.
+            Academic anchor:
+            <a
+              href="https://arxiv.org/html/2311.03490v4"
+              target="_blank"
+              rel="noopener"
+              >arXiv:2311.03490</a
+            >.
+          </p>
+          <p class="build-note">
+            Built end-to-end with <b>Claude Code</b> — data pipeline,
+            win-probability model, and this interface. Source:
+            <a
+              id="repoLink"
+              href="https://github.com/agv117"
+              target="_blank"
+              rel="noopener"
+              >github.com/agv117/nfl-4th-down</a
+            >.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span>Anand Vaghasia · 2026</span>
+      <span class="mono" id="footData">nflverse 2015–2024</span>
+    </footer>
+
+    <script src="app.js?v=1"></script>
+  </body>
+</html>
